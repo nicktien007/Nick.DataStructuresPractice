@@ -17,6 +17,8 @@ void initA();
 
 void transpose(Term a[], Term b[]);
 
+void fastTranspose(Term a[], Term b[]);
+
 void showArry(Term arr[]) {
     for (int i = 0; i < MAX_TERMS; ++i) {
         printf("row=%d,col=%d,val=%d \n", arr[i].row, arr[i].col, arr[i].value);
@@ -29,7 +31,8 @@ int main() {
     initA();
     showArry(a);
 
-    transpose(a, b);
+//    transpose(a, b);
+    fastTranspose(a, b);
 
     showArry(b);
 
@@ -87,8 +90,9 @@ void transpose(Term a[], Term b[]) {
     b[0].col = a[0].col;
     b[0].value = n;
 
+    //非零矩陣
     if (n <= 0)
-        return;     //非零矩陣
+        return;
 
     current_b = 1;
     for (i = 0; i < a[0].col; i++) {
@@ -102,5 +106,50 @@ void transpose(Term a[], Term b[]) {
                 current_b++;
             }
         }
+    }
+}
+
+void fastTranspose(Term a[], Term b[]) {
+    int maxCol = 5;
+    int rowTerms[maxCol];
+    int b_StartingPos[maxCol];
+
+    int i, bIdx;
+    int numCols = a[0].col;
+    int numTerms = a[0].value;
+
+    b[0].row = numCols;
+    b[0].col = a[0].row;
+    b[0].value = numTerms;
+
+
+    if (numTerms <= 0)
+        return;
+
+    //init rowTerms
+    for (i = 0; i < numCols; i++) {
+        rowTerms[i] = 0;
+    }
+
+    //計算a每個 col出現次數，存入 rowTerms
+    //稍候拿來給b_StartingPos 計算每col 配發幾個位置
+    for (i = 1; i <= numTerms; i++) {
+        rowTerms[a[i].col]++;
+    }
+
+    //保存a[i].col的值位於b的idx 位置
+    b_StartingPos[0] = 1;
+    for (i = 1; i < numCols; i++) {
+        b_StartingPos[i] = b_StartingPos[i - 1] + rowTerms[i - 1];
+    }
+
+    //先取得a[i].col位於b_StartingPos的 b的index 位置
+    //將對應值塞入
+    for (i = 1; i <= numTerms; i++) {
+        bIdx = b_StartingPos[a[i].col]++;
+
+        b[bIdx].row = a[i].col;
+        b[bIdx].col = a[i].row;
+        b[bIdx].value = a[i].value;
     }
 }
