@@ -5,3 +5,4 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_executable(padd padd.cpp)
 add_executable(sparseMatrix sparseMatrix.cpp)
+add_executable(stack stack.cpp)
